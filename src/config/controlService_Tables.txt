@@ -1,0 +1,39 @@
+/* Patient's Table */
+
+CREATE TABLE patient(
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100) NOT NULL,
+phone VARCHAR(15) NOT NULL
+);
+
+
+/* Physiotherapist's Table */
+
+CREATE TABLE physiotherapist(
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100) NOT NULL,
+email VARCHAR(100) NOT NULL,
+password VARCHAR(100) NOT NULL,
+procedures VARCHAR(100) NOT NULL,
+commissions DOUBLE NOT NULL
+);
+
+
+
+/* Appointment's Table */
+
+CREATE TABLE appointment(
+id INT AUTO_INCREMENT PRIMARY KEY,
+appointment_date DATE NOT NULL,
+start_hour TIME NOT NULL,
+end_hour TIME NOT NULL,
+duration TIME NOT NULL,
+procedure_value DOUBLE NOT NULL,
+procedure_name VARCHAR(100) NOT NULL,
+
+/* Foreign Keys */
+patient_id INT,
+FOREIGN KEY (patient_id) REFERENCES patient(id),
+physiotherapist_id INT,
+FOREIGN KEY (physiotherapist_id) REFERENCES physiotherapist(id)
+);
