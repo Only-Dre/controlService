@@ -1,9 +1,15 @@
 package app.appointment.domain;
 
+import util.ConnectionFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentDAO {
-
     /* READ ALL*/
     public List<Appointment> buscarTodos() throws SQLException {
 
@@ -16,11 +22,18 @@ public class AppointmentDAO {
             ResultSet rs = stmt.executeQuery();) {
 
             while(rs.next()) {
+
+
                 Appointment appointment = new Appointment(
                         rs.getLong("id"),
-                        rs.getString("nome"),
-                        rs.getDouble("preco"),
-                        rs.getInt("estoque")
+                        rs.getLong("patient_id"),
+                        rs.getLong("physiotherapist_id"),
+                        rs.getString("procedure"),
+                        rs.getDate("appointment"),
+                        rs.getTime("start_hour"),
+                        rs.getTime("end_hour"),
+                        rs.getTime("duration"),
+                        rs.getDouble("procedure_value")
                 );
 
                 appointments.add(appointment);
