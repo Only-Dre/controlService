@@ -1,8 +1,8 @@
-package app.physiotherapist.domain;
+package app.physiotherapist;
 
 import java.util.List;
 
-public class Physiotherapist {
+public class PhysiotherapistEntity {
 
     private Long id;
     private String name;
@@ -11,7 +11,7 @@ public class Physiotherapist {
     private List<String> procedures;
     private Double commission;
 
-    public Physiotherapist(Long id, String name, String email, String password, List<String> procedures, Double commission) {
+    public PhysiotherapistEntity(Long id, String name, String email, String password, List<String> procedures, Double commission) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -20,7 +20,7 @@ public class Physiotherapist {
         this.commission = commission;
     }
 
-    public Physiotherapist() {
+    public PhysiotherapistEntity() {
     }
 
     /*GETTERS AND SETTERS*/
