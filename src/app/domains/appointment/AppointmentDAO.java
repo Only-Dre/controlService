@@ -1,6 +1,7 @@
-package app.appointment.domain;
+/*
+package app.domains.appointment;
 
-import util.ConnectionFactory;
+import app.util.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,10 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentDAO {
-    /* READ ALL*/
-    public List<Appointment> buscarTodos() throws SQLException {
+    */
+/* READ ALL*//*
 
-        List<Appointment> appointments = new ArrayList<>();
+    public List<AppointmentEntity> buscarTodos() throws SQLException {
+
+        List<AppointmentEntity> appointmentEntities = new ArrayList<>();
 
         String sql = "SELECT * FROM appointment";
 
@@ -24,32 +27,34 @@ public class AppointmentDAO {
             while(rs.next()) {
 
 
-                Appointment appointment = new Appointment(
+                AppointmentEntity appointmentEntity = new AppointmentEntity(
                         rs.getLong("id"),
                         rs.getLong("patient_id"),
                         rs.getLong("physiotherapist_id"),
                         rs.getString("procedure"),
-                        rs.getDate("appointment"),
+                        rs.getDate("appointmentEntity"),
                         rs.getTime("start_hour"),
                         rs.getTime("end_hour"),
                         rs.getTime("duration"),
                         rs.getDouble("procedure_value")
                 );
 
-                appointments.add(appointment);
+                appointmentEntities.add(appointmentEntity);
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao buscar appointments: " + e.getMessage());
+            System.out.println("Erro ao buscar appointmentEntities: " + e.getMessage());
             e.printStackTrace();
         }
 
-        return appointments;
+        return appointmentEntities;
     };
 
-    /*READ BY ID*/
-    public Appointment buscarPorId(Long id) throws SQLException {
+    */
+/*READ BY ID*//*
 
-        Appointment appointment = null;
+    public AppointmentEntity buscarPorId(Long id) throws SQLException {
+
+        AppointmentEntity appointmentEntity = null;
 
         String sql = "SELECT * FROM appointments WHERE id = ?";
 
@@ -60,7 +65,7 @@ public class AppointmentDAO {
 
             try(ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    appointment = new Appointment(
+                    appointmentEntity = new AppointmentEntity(
                             rs.getLong("id"),
                             rs.getString("nome"),
                             rs.getDouble("preco"),
@@ -68,65 +73,71 @@ public class AppointmentDAO {
                     );
                 }
             } catch(SQLException e) {
-                System.out.println("Erro ao buscar appointment. ID: " + id);
+                System.out.println("Erro ao buscar appointmentEntity. ID: " + id);
             }
         }
 
-        return appointment;
+        return appointmentEntity;
     };
 
-    /*CREATE*/
-    public void inserir(Appointment appointment) {
+    */
+/*CREATE*//*
+
+    public void inserir(AppointmentEntity appointmentEntity) {
         String sql = "INSERT INTO appointments (nome, preco, estoque) VALUES (?,?,?)";
 
         try(Connection conn = ConnectionFactory.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
-            stmt.setString(1, appointment.getNome());
-            stmt.setDouble(2,appointment.getPreco());
-            stmt.setInt(3, appointment.getEstoque());
+            stmt.setString(1, appointmentEntity.getNome());
+            stmt.setDouble(2, appointmentEntity.getPreco());
+            stmt.setInt(3, appointmentEntity.getEstoque());
 
             stmt.executeUpdate();
 
             try(ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    appointment.setId(rs.getLong(1));
+                    appointmentEntity.setId(rs.getLong(1));
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao inseriro o appointment" + appointment.getNome());
+            System.out.println("Erro ao inseriro o appointmentEntity" + appointmentEntity.getNome());
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
     };
 
-    /*UPDATE*/
-    public void atualizar(Appointment appointment) {
+    */
+/*UPDATE*//*
+
+    public void atualizar(AppointmentEntity appointmentEntity) {
         String sql = "UPDATE appointments SET nome = ?, preco = ?, estoque = ? WHERE id = ?";
 
         try(Connection conn = ConnectionFactory.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);) {
 
-            stmt.setString(1, appointment.getNome());
-            stmt.setDouble(2, appointment.getPreco());
-            stmt.setInt(3, appointment.getEstoque());
+            stmt.setString(1, appointmentEntity.getNome());
+            stmt.setDouble(2, appointmentEntity.getPreco());
+            stmt.setInt(3, appointmentEntity.getEstoque());
 
-            stmt.setLong(4, appointment.getId());
+            stmt.setLong(4, appointmentEntity.getId());
 
             int linhasAfetadas = stmt.executeUpdate();
 
-            System.out.println("Appointment ID: " + appointment.getId() + " Atualizado");
+            System.out.println("AppointmentEntity ID: " + appointmentEntity.getId() + " Atualizado");
             System.out.println("Linhas afetadas: " + linhasAfetadas);
 
         } catch(SQLException e) {
-            System.out.println("Erro ao atualizar o appointment: " + appointment.getNome());
+            System.out.println("Erro ao atualizar o appointmentEntity: " + appointmentEntity.getNome());
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
     };
 
 
-    /*DELETE*/
+    */
+/*DELETE*//*
+
     public void deletar(Long id) {
         String sql = "DELETE FROM appointments WHERE id = ?";
 
@@ -137,7 +148,7 @@ public class AppointmentDAO {
 
             int linhasAfetadas = stmt.executeUpdate();
 
-            System.out.println("Appointment Excluído.");
+            System.out.println("AppointmentEntity Excluído.");
             System.out.println("Linhas afetadas: " + linhasAfetadas);
 
         } catch(SQLException e) {
@@ -147,3 +158,4 @@ public class AppointmentDAO {
         }
     }
 }
+*/

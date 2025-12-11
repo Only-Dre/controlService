@@ -1,4 +1,4 @@
-package util;
+package app.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,9 +7,9 @@ import java.sql.SQLException;
 public class ConnectionFactory {
 
     // AJUSTE o nome do banco de acordo com o seu MySQL Workbench
-    private static final String URL = "jdbc:mysql://localhost:3306/control_service?useSSL=false&serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://localhost:3306/service_control";
     private static final String USER = "root";
-    private static final String PASS = "aluno";
+    private static final String PASS = "200192Ka.@";
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     public static Connection getConnection() {

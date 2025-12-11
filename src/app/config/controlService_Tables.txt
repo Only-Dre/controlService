@@ -1,0 +1,48 @@
+CREATE DATABASE service_control;
+
+USE service_control;
+
+CREATE TABLE patient(
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	phone VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE physiotherapist(
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	email VARCHAR(100) NOT NULL,
+	password VARCHAR(100) NOT NULL,
+	commissions DOUBLE NOT NULL
+);
+
+CREATE TABLE techniques (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(100)
+);
+
+CREATE TABLE physiotherapist_techniques (
+    physiotherapist_id BIGINT NOT NULL,
+    techniques_id BIGINT NOT NULL,
+
+    PRIMARY KEY (physiotherapist_id, techniques_id), -- Chave primária composta: a combinação fisio + técnica é única
+
+    FOREIGN KEY (physiotherapist_id) REFERENCES physiotherapist(id),
+    FOREIGN KEY (techniques_id) REFERENCES techniques(id)
+);
+
+CREATE TABLE appointmentEntity(
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    patient_id BIGINT,
+    physiotherapist_id BIGINT,
+    date DATE NOT NULL,
+    start_hour TIME NOT NULL,
+    end_hour TIME NOT NULL,
+    duration TIME NOT NULL,
+    value DOUBLE NOT NULL,
+
+    /* Foreign Keys */
+    FOREIGN KEY (patient_id) REFERENCES patient(id),
+    FOREIGN KEY (physiotherapist_id) REFERENCES physiotherapist(id)
+);

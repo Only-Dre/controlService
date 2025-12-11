@@ -1,26 +1,24 @@
-package app.physiotherapist.domain;
+package app.domains.physiotherapist;
 
 import java.util.List;
 
-public class Physiotherapist {
+public class PhysiotherapistEntity {
 
     private Long id;
     private String name;
     private String email;
     private String password;
-    private List<String> procedures;
     private Double commission;
 
-    public Physiotherapist(Long id, String name, String email, String password, List<String> procedures, Double commission) {
+    public PhysiotherapistEntity(Long id, String name, String email, String password, Double commission) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.procedures = procedures;
         this.commission = commission;
     }
 
-    public Physiotherapist() {
+    public PhysiotherapistEntity() {
     }
 
     /*GETTERS AND SETTERS*/
@@ -54,14 +52,6 @@ public class Physiotherapist {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getProcedures() {
-        return procedures;
-    }
-
-    public void setProcedures(String procedures) {
-        this.procedures = procedures;
     }
 
     public Double getCommission() {

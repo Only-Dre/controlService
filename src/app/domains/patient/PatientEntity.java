@@ -1,18 +1,18 @@
-package app.patient.domain;
+package app.domains.patient;
 
-public class Patient {
+public class PatientEntity {
 
     private Long id;
     private String name;
     private String phone;
 
-    public Patient(Long id, String name, String phone) {
+    public PatientEntity(Long id, String name, String phone) {
         this.id = id;
         this.name = name;
         this.phone = phone;
     }
 
-    public Patient() {
+    public PatientEntity() {
     }
 
 
