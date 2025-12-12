@@ -1,4 +1,3 @@
-/*
 package app.domains.appointment;
 
 import app.util.ConnectionFactory;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentDAO {
-    */
-/* READ ALL*//*
 
     public List<AppointmentEntity> buscarTodos() throws SQLException {
 
@@ -21,8 +18,8 @@ public class AppointmentDAO {
         String sql = "SELECT * FROM appointment";
 
         try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();) {
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            ResultSet result = preparedStatement.executeQuery();) {
 
             while(rs.next()) {
 
@@ -49,8 +46,7 @@ public class AppointmentDAO {
         return appointmentEntities;
     };
 
-    */
-/*READ BY ID*//*
+READ BY ID
 
     public AppointmentEntity buscarPorId(Long id) throws SQLException {
 
@@ -80,8 +76,7 @@ public class AppointmentDAO {
         return appointmentEntity;
     };
 
-    */
-/*CREATE*//*
+CREATE
 
     public void inserir(AppointmentEntity appointmentEntity) {
         String sql = "INSERT INTO appointments (nome, preco, estoque) VALUES (?,?,?)";
@@ -107,8 +102,7 @@ public class AppointmentDAO {
         }
     };
 
-    */
-/*UPDATE*//*
+UPDATE
 
     public void atualizar(AppointmentEntity appointmentEntity) {
         String sql = "UPDATE appointments SET nome = ?, preco = ?, estoque = ? WHERE id = ?";
@@ -135,8 +129,7 @@ public class AppointmentDAO {
     };
 
 
-    */
-/*DELETE*//*
+DELETE
 
     public void deletar(Long id) {
         String sql = "DELETE FROM appointments WHERE id = ?";
@@ -158,4 +151,3 @@ public class AppointmentDAO {
         }
     }
 }
-*/
