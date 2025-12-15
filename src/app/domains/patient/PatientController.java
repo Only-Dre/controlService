@@ -1,37 +1,25 @@
 package app.domains.patient;
 
 import com.google.gson.Gson;
-import spark.Filter;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import java.sql.SQLException;
-
-import static spark.Spark.*;
-import static spark.Spark.after;
-import static spark.Spark.port;
+import static spark.Spark.delete;
+import static spark.Spark.get;
+import static spark.Spark.post;
+import static spark.Spark.put;
 
 public class PatientController {
 
     private static final PatientDAO patientDAO = new PatientDAO();
     private static final Gson gson = new Gson();
 
-    private static final String APLICATION_JSON = "application/json";
-
-
     public static void run() {
-        port(1234);
-
-        after(new Filter() {
-            public void handle(Request request, Response response) throws Exception {
-                response.type(APLICATION_JSON);
-            }
-        });
 
 
-        /*PATIENT*/
-        /*GET ALL*/
         get("/patient", new Route() {
             @Override
             public Object handle(Request request, Response response) throws Exception {
@@ -39,7 +27,7 @@ public class PatientController {
             }
         });
 
-        /*GET BY ID*/
+
         get("/patient/:id", new Route() {
             @Override
             public Object handle(Request request, Response response) throws Exception {
@@ -61,7 +49,7 @@ public class PatientController {
             }
         });
 
-        /*POST*/
+
         post("/patient", new Route() {
             @Override
             public Object handle(Request request, Response response) throws Exception {
@@ -73,17 +61,49 @@ public class PatientController {
                     response.status(201);
 
                     return gson.toJson(newPatient);
+
+                } catch (NullPointerException e) {
+                    response.status(400);
+                    e.printStackTrace();
+                    return
+                        "{" +
+                        "\"message\": \"Erro ao criar Fisioterapeuta.\"," +
+                        "\"erro\": \"" + e.getMessage() + "\"" +
+                        "}"
+                    ;
+                } catch (SQLIntegrityConstraintViolationException e) {
+                    response.status(409);
+                    e.printStackTrace();
+                    return
+                        "{" +
+                        "\"message\": \"Erro ao criar paciente.\"," +
+                        "\"erro\": \"" + e.getMessage() + "\"" +
+                        "}"
+                    ;
+                } catch (IllegalArgumentException e) {
+                    response.status(400);
+                    e.printStackTrace();
+                    return
+                        "{" +
+                        "\"message\": \"Erro ao criar paciente.\"," +
+                        "\"erro\": \"" + e.getMessage() + "\"" +
+                        "}"
+                    ;
+                } catch (SQLException e) {
+                    response.status(500);
+                    e.printStackTrace();
+                    return "{\"message\": \"Erro geral no banco de dados..\"}";
                 } catch (Exception e) {
                     response.status(500);
-                    System.out.println("Erro ao processar a requisição POST");
-                    System.out.println(e.getMessage());
                     e.printStackTrace();
-                    return "{\"message\": \"Erro ao criar produto.\"}";
+                    return "{\"message\": \"Falha no servidor!.\"}";
                 }
+
             }
+
         });
 
-        // PUT /patient/:id - Atualizar produto existente
+
         put("/patient/:id", new Route() {
             @Override
             public Object handle(Request request, Response response) {
@@ -115,7 +135,7 @@ public class PatientController {
             }
         });
 
-        // DELETE /patient/:id - Deletar um produto
+
         delete("/patient/:id", new Route() {
             @Override
             public Object handle(Request request, Response response) {

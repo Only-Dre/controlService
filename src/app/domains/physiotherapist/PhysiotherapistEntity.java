@@ -1,6 +1,6 @@
 package app.domains.physiotherapist;
 
-import java.util.List;
+import app.domains.physiotherapist.enums.TechniquesENUM;
 
 public class PhysiotherapistEntity {
 
@@ -8,17 +8,32 @@ public class PhysiotherapistEntity {
     private String name;
     private String email;
     private String password;
+    private TechniquesENUM technique;
     private Double commission;
 
-    public PhysiotherapistEntity(Long id, String name, String email, String password, Double commission) {
+    public PhysiotherapistEntity(Long id, String name, String email, String password, TechniquesENUM technique, Double commission) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.technique = technique;
         this.commission = commission;
     }
 
     public PhysiotherapistEntity() {
+
+    }
+
+    @Override
+    public String toString() {
+        return "PhysiotherapistEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", technique=" + technique +
+                ", commission=" + commission +
+                '}';
     }
 
     /*GETTERS AND SETTERS*/
@@ -60,5 +75,13 @@ public class PhysiotherapistEntity {
 
     public void setCommission(Double commission) {
         this.commission = commission;
+    }
+
+    public TechniquesENUM getTechnique() {
+        return technique;
+    }
+
+    public void setTechnique(TechniquesENUM technique) {
+        this.technique = technique;
     }
 }

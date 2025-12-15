@@ -5,6 +5,8 @@ import app.util.ConnectionFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PatientDAO {
 
@@ -63,14 +65,34 @@ public class PatientDAO {
     };
 
 
-    public void save(PatientEntity patient) {
+    public void save(PatientEntity patient) throws SQLException {
+
+
+        String nome = patient.getName().trim();
+
+        if (nome.length() < 3) {
+            throw new IllegalArgumentException("Nome deve ter no mínimo 3 caracteres");
+        }
+
+        Pattern patternName = Pattern.compile("\\d");
+        Matcher matcherName = patternName.matcher(nome);
+        if (matcherName.find()) {
+            throw new IllegalArgumentException("Nome não pode conter números");
+        }
+
+        Pattern patternTelefone = Pattern.compile("^\\d{11}$");
+        Matcher matcherTelefone = patternTelefone.matcher(patient.getPhone());
+
+        if (!matcherTelefone.matches()) {
+            throw new IllegalArgumentException("Telefone deve conter 11 dígitos numéricos (DDD + número)");
+        }
 
         String sql = "INSERT INTO patient (name, phone) VALUES (?, ?)";
 
         try(Connection conn = ConnectionFactory.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
-            preparedStatement.setString(1, patient.getName());
+            preparedStatement.setString(1, patient.getName().toLowerCase());
             preparedStatement.setString(2, patient.getPhone());
 
             preparedStatement.executeUpdate();
@@ -80,10 +102,15 @@ public class PatientDAO {
                     patient.setId(result.getLong(1));
                 }
             }
-        } catch (SQLException e) {
-            System.out.println("Erro ao inserir o paciente" + patient.getName());
-            System.out.println(e.getMessage());
+        } catch (NullPointerException e) {
             e.printStackTrace();
+            throw new NullPointerException(e.getMessage());
+        }catch (SQLIntegrityConstraintViolationException e) {
+            e.printStackTrace();
+            throw new SQLIntegrityConstraintViolationException(e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e.getMessage());
         }
     };
 
@@ -93,7 +120,7 @@ public class PatientDAO {
         try(Connection conn = ConnectionFactory.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(sql);) {
 
-            preparedStatement.setString(1, patient.getName());
+            preparedStatement.setString(1, patient.getName().toLowerCase());
             preparedStatement.setString(2, patient.getPhone());
             preparedStatement.setLong(3, patient.getId());
 

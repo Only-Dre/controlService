@@ -13,36 +13,38 @@ CREATE TABLE physiotherapist(
 	name VARCHAR(100) NOT NULL,
 	email VARCHAR(100) NOT NULL,
 	password VARCHAR(100) NOT NULL,
-	commissions DOUBLE NOT NULL
+	technique VARCHAR(100) NOT NULL,
+	commission DOUBLE NOT NULL
 );
 
-CREATE TABLE techniques (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(100)
-);
 
-CREATE TABLE physiotherapist_techniques (
-    physiotherapist_id BIGINT NOT NULL,
-    techniques_id BIGINT NOT NULL,
-
-    PRIMARY KEY (physiotherapist_id, techniques_id), -- Chave primária composta: a combinação fisio + técnica é única
-
-    FOREIGN KEY (physiotherapist_id) REFERENCES physiotherapist(id),
-    FOREIGN KEY (techniques_id) REFERENCES techniques(id)
-);
-
-CREATE TABLE appointmentEntity(
+CREATE TABLE appointment(
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     patient_id BIGINT,
     physiotherapist_id BIGINT,
+    technique VARCHAR(100) NOT NULL,
     date DATE NOT NULL,
-    start_hour TIME NOT NULL,
-    end_hour TIME NOT NULL,
-    duration TIME NOT NULL,
+    duration INT NOT NULL,
     value DOUBLE NOT NULL,
+    net_value DOUBLE NOT NULL,
 
     /* Foreign Keys */
     FOREIGN KEY (patient_id) REFERENCES patient(id),
     FOREIGN KEY (physiotherapist_id) REFERENCES physiotherapist(id)
+);
+
+CREATE TABLE technique (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    value DOUBLE NOT NULL
+);
+
+CREATE TABLE physiotherapist_technique (
+    physiotherapist_id BIGINT NOT NULL,
+    technique_id BIGINT NOT NULL,
+
+    PRIMARY KEY (physiotherapist_id, technique_id), -- Chave primária composta: a combinação fisio + técnica é única
+
+    FOREIGN KEY (physiotherapist_id) REFERENCES physiotherapist(id),
+    FOREIGN KEY (technique_id) REFERENCES technique(id)
 );

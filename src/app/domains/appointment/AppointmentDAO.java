@@ -1,137 +1,191 @@
 package app.domains.appointment;
 
+import app.domains.appointment.dtos.AppointmentDTO;
+import app.domains.patient.PatientDAO;
+import app.domains.patient.PatientEntity;
+import app.domains.physiotherapist.PhysiotherapistDAO;
+import app.domains.physiotherapist.PhysiotherapistEntity;
+import app.domains.technique.TechniqueDAO;
 import app.util.ConnectionFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentDAO {
 
-    public List<AppointmentEntity> buscarTodos() throws SQLException {
+    PatientDAO patientDAO = new PatientDAO();
+    PhysiotherapistDAO physiotherapistDAO = new PhysiotherapistDAO();
+    TechniqueDAO techniqueDAO = new TechniqueDAO();
+
+    public List<AppointmentEntity> findAll() throws SQLException {
 
         List<AppointmentEntity> appointmentEntities = new ArrayList<>();
 
-        String sql = "SELECT * FROM appointment";
+        String sqlAppointment = "SELECT * FROM appointment";
 
         try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            PreparedStatement preparedStatement = conn.prepareStatement(sqlAppointment);
             ResultSet result = preparedStatement.executeQuery();) {
 
-            while(rs.next()) {
+            while(result.next()) {
 
+                PatientEntity patient = patientDAO.findById(result.getLong("patient_id"));
+                PhysiotherapistEntity physiotherapist = physiotherapistDAO.findById(result.getLong("physiotherapist_id"));
 
                 AppointmentEntity appointmentEntity = new AppointmentEntity(
-                        rs.getLong("id"),
-                        rs.getLong("patient_id"),
-                        rs.getLong("physiotherapist_id"),
-                        rs.getString("procedure"),
-                        rs.getDate("appointmentEntity"),
-                        rs.getTime("start_hour"),
-                        rs.getTime("end_hour"),
-                        rs.getTime("duration"),
-                        rs.getDouble("procedure_value")
+                        result.getLong("id"),
+                        patient,
+                        physiotherapist,
+                        physiotherapist.getTechnique(),
+                        result.getObject("date", LocalDateTime.class),
+                        result.getInt("duration")
                 );
 
                 appointmentEntities.add(appointmentEntity);
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao buscar appointmentEntities: " + e.getMessage());
+            System.out.println("Erro ao buscar os atendimentos: " + e.getMessage());
             e.printStackTrace();
         }
 
         return appointmentEntities;
     };
 
-READ BY ID
 
-    public AppointmentEntity buscarPorId(Long id) throws SQLException {
+
+    public AppointmentEntity findById(Long id) throws SQLException {
 
         AppointmentEntity appointmentEntity = null;
 
-        String sql = "SELECT * FROM appointments WHERE id = ?";
+        String sql = "SELECT * FROM appointment WHERE id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);) {
+             PreparedStatement preparedStatement = conn.prepareStatement(sql);) {
 
-            stmt.setLong(1, id);
+            preparedStatement.setLong(1, id);
 
-            try(ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
+            try(ResultSet result = preparedStatement.executeQuery()) {
+                if (result.next()) {
+
+                    PatientEntity patient = patientDAO.findById(result.getLong("patient_id"));
+                    PhysiotherapistEntity physiotherapist = physiotherapistDAO.findById(result.getLong("physiotherapist_id"));
+
                     appointmentEntity = new AppointmentEntity(
-                            rs.getLong("id"),
-                            rs.getString("nome"),
-                            rs.getDouble("preco"),
-                            rs.getInt("estoque")
+                            result.getLong("id"),
+                            patient,
+                            physiotherapist,
+                            physiotherapist.getTechnique(),
+                            result.getObject("date", LocalDateTime.class),
+                            result.getInt("duration")
                     );
                 }
             } catch(SQLException e) {
-                System.out.println("Erro ao buscar appointmentEntity. ID: " + id);
+                System.out.println("Erro ao buscar atendimento. ID: " + id);
             }
         }
 
         return appointmentEntity;
     };
 
-CREATE
 
-    public void inserir(AppointmentEntity appointmentEntity) {
-        String sql = "INSERT INTO appointments (nome, preco, estoque) VALUES (?,?,?)";
+
+    public AppointmentEntity save(AppointmentDTO appointmentDTO) throws SQLException {
+
+        // Validação da data
+        if (appointmentDTO.date() == null) {
+            throw new IllegalArgumentException("Data do agendamento é obrigatória");
+        }
+
+        if (appointmentDTO.date().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Data do agendamento não pode estar no passado");
+        }
+
+        PatientEntity patient = patientDAO.findById(appointmentDTO.patientId());
+        PhysiotherapistEntity physiotherapist = physiotherapistDAO.findById(appointmentDTO.physiotherapistId());
+
+        AppointmentEntity appointmentEntity = new AppointmentEntity(patient, physiotherapist, physiotherapist.getTechnique(), appointmentDTO.date(), appointmentDTO.duration());
+
+        String sql = "INSERT INTO appointment (patient_id, physiotherapist_id, technique, date, duration, value, net_value) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
-            stmt.setString(1, appointmentEntity.getNome());
-            stmt.setDouble(2, appointmentEntity.getPreco());
-            stmt.setInt(3, appointmentEntity.getEstoque());
+            preparedStatement.setLong(1, appointmentEntity.getPatient().getId());
+            preparedStatement.setLong(2, appointmentEntity.getPhysiotherapist().getId());
+            preparedStatement.setString(3, appointmentEntity.getPhysiotherapist().getTechnique().name());
+            preparedStatement.setObject(4, appointmentEntity.getDate());
+            preparedStatement.setInt(5, appointmentEntity.getDuration());
+            preparedStatement.setDouble(7, appointmentEntity.getNetValue());
+            preparedStatement.setDouble(6, appointmentEntity.getValue());
 
-            stmt.executeUpdate();
 
-            try(ResultSet rs = stmt.getGeneratedKeys()) {
+            preparedStatement.executeUpdate();
+
+            try(ResultSet rs = preparedStatement.getGeneratedKeys()) {
                 if (rs.next()) {
                     appointmentEntity.setId(rs.getLong(1));
                 }
             }
+
         } catch (SQLException e) {
-            System.out.println("Erro ao inseriro o appointmentEntity" + appointmentEntity.getNome());
             System.out.println(e.getMessage());
             e.printStackTrace();
+            throw new SQLException(e.getMessage());
         }
+
+        return appointmentEntity;
     };
 
-UPDATE
 
-    public void atualizar(AppointmentEntity appointmentEntity) {
-        String sql = "UPDATE appointments SET nome = ?, preco = ?, estoque = ? WHERE id = ?";
+
+    public AppointmentEntity update(Long appointementId ,AppointmentDTO appointmentDTO) throws SQLException {
+
+        if (appointmentDTO.date() == null) {
+            throw new IllegalArgumentException("Data do agendamento é obrigatória");
+        }
+
+        if (appointmentDTO.date().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Data do agendamento não pode estar no passado");
+        }
+
+        PatientEntity patient = patientDAO.findById(appointmentDTO.patientId());
+        PhysiotherapistEntity physiotherapist = physiotherapistDAO.findById(appointmentDTO.physiotherapistId());
+
+        AppointmentEntity appointmentEntity = new AppointmentEntity(patient, physiotherapist, physiotherapist.getTechnique(), appointmentDTO.date(), appointmentDTO.duration());
+        String sql = "UPDATE appointment SET patient_id = ?, physiotherapist_id = ?, technique = ?, date = ?, duration = ?, value = ?, net_value = ? WHERE id = ?";
 
         try(Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);) {
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);) {
 
-            stmt.setString(1, appointmentEntity.getNome());
-            stmt.setDouble(2, appointmentEntity.getPreco());
-            stmt.setInt(3, appointmentEntity.getEstoque());
+            preparedStatement.setLong(1, appointmentEntity.getPatient().getId());
+            preparedStatement.setLong(2, appointmentEntity.getPhysiotherapist().getId());
+            preparedStatement.setString(3, appointmentEntity.getPhysiotherapist().getTechnique().name());
+            preparedStatement.setObject(4, appointmentEntity.getDate());
+            preparedStatement.setInt(5, appointmentEntity.getDuration());
+            preparedStatement.setDouble(6, appointmentEntity.getValue());
+            preparedStatement.setDouble(7, appointmentEntity.getNetValue());
+            preparedStatement.setLong(8, appointementId);
 
-            stmt.setLong(4, appointmentEntity.getId());
-
-            int linhasAfetadas = stmt.executeUpdate();
+            int linhasAfetadas = preparedStatement.executeUpdate();
 
             System.out.println("AppointmentEntity ID: " + appointmentEntity.getId() + " Atualizado");
             System.out.println("Linhas afetadas: " + linhasAfetadas);
 
         } catch(SQLException e) {
-            System.out.println("Erro ao atualizar o appointmentEntity: " + appointmentEntity.getNome());
             System.out.println(e.getMessage());
             e.printStackTrace();
+            throw new SQLException(e.getMessage());
         }
+
+        return appointmentEntity;
     };
 
 
-DELETE
 
-    public void deletar(Long id) {
+
+    public void delete(Long id) {
         String sql = "DELETE FROM appointments WHERE id = ?";
 
         try(Connection conn = ConnectionFactory.getConnection();

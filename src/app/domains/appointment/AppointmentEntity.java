@@ -2,30 +2,41 @@ package app.domains.appointment;
 
 import app.domains.patient.PatientEntity;
 import app.domains.physiotherapist.PhysiotherapistEntity;
+import app.domains.physiotherapist.enums.TechniquesENUM;
 
-// Classe de Atendimento
+import java.time.LocalDateTime;
+
+
 public class AppointmentEntity {
 
     private Long id;
-    private PatientEntity patientEntity; // Paciente
-    private PhysiotherapistEntity physiotherapistEntity; // Fisioterapeuta
-    private String procedures; // Procedimentos
-    private String date; // Data
-    private String startHour; // Horário de Início do Atendimento
-    private String endHour; // Horário do Fim do Atendimento
-    private String duration; // Duração do Atendimento
-    private String procedureValue; // Valor do rocedimento
+    private PatientEntity patient;
+    private PhysiotherapistEntity physiotherapist;
+    private TechniquesENUM technique;
+    private LocalDateTime date;
+    private Integer duration;
+    private Double value;
+    private Double netValue;
 
-    public AppointmentEntity(Long id, PatientEntity patientEntity, PhysiotherapistEntity physiotherapistEntity, String procedures, String date, String startHour, String endHour, String duration, String procedureValue) {
+    public AppointmentEntity(Long id, PatientEntity patient, PhysiotherapistEntity physiotherapist, TechniquesENUM technique, LocalDateTime date, Integer duration) {
         this.id = id;
-        this.patientEntity = patientEntity;
-        this.physiotherapistEntity = physiotherapistEntity;
-        this.procedures = procedures;
+        this.patient = patient;
+        this.physiotherapist = physiotherapist;
+        this.technique = technique;
         this.date = date;
-        this.startHour = startHour;
-        this.endHour = endHour;
         this.duration = duration;
-        this.procedureValue = procedureValue;
+        this.value = this.technique.getValue();
+        this.netValue = (this.value * physiotherapist.getCommission()) / 100;
+    }
+
+    public AppointmentEntity(PatientEntity patient, PhysiotherapistEntity physiotherapist, TechniquesENUM technique, LocalDateTime date, Integer duration) {
+        this.patient = patient;
+        this.physiotherapist = physiotherapist;
+        this.technique = technique;
+        this.date = date;
+        this.duration = duration;
+        this.value = this.technique.getValue();
+        this.netValue = (this.value * physiotherapist.getCommission()) / 100;
     }
 
     public AppointmentEntity() {
@@ -43,66 +54,56 @@ public class AppointmentEntity {
     }
 
     public PatientEntity getPatient() {
-        return patientEntity;
+        return patient;
     }
 
     public void setPatient(PatientEntity patientEntity) {
-        this.patientEntity = patientEntity;
+        this.patient = patientEntity;
     }
 
     public PhysiotherapistEntity getPhysiotherapist() {
-        return physiotherapistEntity;
+        return physiotherapist;
     }
 
-    public void setPhysiotherapist(PhysiotherapistEntity physiotherapistEntity) {
-        this.physiotherapistEntity = physiotherapistEntity;
+    public void setPhysiotherapist(PhysiotherapistEntity physiotherapistEntity) {this.physiotherapist = physiotherapistEntity;}
+
+    public TechniquesENUM getTechnique() {
+        return technique;
     }
 
-    public String getProcedures() {
-        return procedures;
+    public void setTechnique(TechniquesENUM technique) {
+        this.technique = technique;
     }
 
-    public void setProcedures(String procedures) {
-        this.procedures = procedures;
-    }
-
-    public String getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
-    public String getStartHour() {
-        return startHour;
-    }
-
-    public void setStartHour(String startHour) {
-        this.startHour = startHour;
-    }
-
-    public String getEndHour() {
-        return endHour;
-    }
-
-    public void setEndHour(String endHour) {
-        this.endHour = endHour;
-    }
-
-    public String getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
 
-    public String getProcedureValue() {
-        return procedureValue;
+    public Double getValue() {
+        return value;
     }
 
-    public void setProcedureValue(String procedureValue) {
-        this.procedureValue = procedureValue;
+    public void setValue(Double value) {
+        this.value = value;
+    }
+
+    public Double getNetValue() {
+        return netValue;
+    }
+
+    public void setNetValue(Double netValue) {
+        this.netValue = netValue;
     }
 }
